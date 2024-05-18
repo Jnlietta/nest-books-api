@@ -16,9 +16,9 @@ export class AuthorsService {
     });
   }
 
-  public create(authorData: Omit<Author, 'id'>): Promise<Author> {
+  public async create(authorData: Omit<Author, 'id'>): Promise<Author> {
     try {
-      return this.prismaService.author.create({
+      return await this.prismaService.author.create({
         data: authorData,
       });
     } catch (error) {
