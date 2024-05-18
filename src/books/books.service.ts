@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { Book } from '@prisma/client';
 import { PrismaService } from 'src/shared/services/prisma.service';
 
@@ -35,6 +35,8 @@ export class BooksService {
     } catch (error) {
       if (error.code === 'P2025')
         throw new BadRequestException("Author doesn't exist");
+      if (error.code === 'P2002')
+        throw new ConflictException('Title is already taken');
       throw error;
     }
   }
