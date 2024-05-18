@@ -1,4 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 
 @Controller('authors')
@@ -8,5 +14,12 @@ export class AuthorsController {
   @Get('/')
   getAll() {
     return this.authorsService.getAll();
+  }
+
+  @Get('/:id')
+  getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    const author = this.authorsService.getById(id);
+    if (!author) throw new NotFoundException('Author not found');
+    return author;
   }
 }
