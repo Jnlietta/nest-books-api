@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Author } from '@prisma/client';
 import { PrismaService } from 'src/shared/services/prisma.service';
 
@@ -14,5 +14,17 @@ export class AuthorsService {
     return this.prismaService.author.findUnique({
       where: { id },
     });
+  }
+
+  public create(authorData: Omit<Author, 'id'>): Promise<Author> {
+    try {
+      return this.prismaService.author.create({
+        data: authorData,
+      });
+    } catch (error) {
+      if (error.code === 'P2002')
+        throw new ConflictException('Author already exists');
+      throw error;
+    }
   }
 }
