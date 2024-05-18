@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -34,7 +35,7 @@ export class AuthorsController {
   }
 
   @Put('/:id')
-  async update(
+  async updateById(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() authorData: UpdateAuthorDTO,
   ) {
@@ -42,6 +43,15 @@ export class AuthorsController {
       throw new NotFoundException('Author not found');
 
     await this.authorsService.updateById(id, authorData);
+    return { success: true };
+  }
+
+  @Delete('/:id')
+  async deleteById(@Param('id', new ParseUUIDPipe()) id: string) {
+    if (!(await this.authorsService.getById(id)))
+      throw new NotFoundException('Author not found');
+
+    await this.authorsService.deleteById(id);
     return { success: true };
   }
 }
