@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { Book } from '@prisma/client';
 import { PrismaService } from 'src/shared/services/prisma.service';
 
@@ -25,6 +29,30 @@ export class BooksService {
     try {
       const { authorId, ...otherData } = bookData;
       return await this.prismaService.book.create({
+        data: {
+          ...otherData,
+          author: {
+            connect: { id: authorId },
+          },
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new BadRequestException("Author doesn't exist");
+      if (error.code === 'P2002')
+        throw new ConflictException('Title is already taken');
+      throw error;
+    }
+  }
+
+  public async updateById(
+    id: Book['id'],
+    bookData: Omit<Book, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Book> {
+    try {
+      const { authorId, ...otherData } = bookData;
+      return await this.prismaService.book.update({
+        where: { id },
         data: {
           ...otherData,
           author: {
