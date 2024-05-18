@@ -18,4 +18,10 @@ export class BooksService {
       include: { author: true },
     });
   }
+
+  public deleteById(id: Book['id']): Promise<Book> {
+    return this.prismaService.book.delete({
+      where: { id },
+    });
+  }
 }
