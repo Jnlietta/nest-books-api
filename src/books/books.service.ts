@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Book } from '@prisma/client';
 import { PrismaService } from 'src/shared/services/prisma.service';
 
@@ -17,6 +17,26 @@ export class BooksService {
       where: { id },
       include: { author: true },
     });
+  }
+
+  public async create(
+    bookData: Omit<Book, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Book> {
+    try {
+      const { authorId, ...otherData } = bookData;
+      return await this.prismaService.book.create({
+        data: {
+          ...otherData,
+          author: {
+            connect: { id: authorId },
+          },
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new BadRequestException("Author doesn't exist");
+      throw error;
+    }
   }
 
   public deleteById(id: Book['id']): Promise<Book> {
