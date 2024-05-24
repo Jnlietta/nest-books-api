@@ -14,7 +14,6 @@ import { BooksService } from './books.service';
 import { CreateBookDTO } from './dtos/create-book.dto';
 import { UpdateBookDTO } from './dtos/update-book.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('books')
 export class BooksController {
@@ -40,12 +39,11 @@ export class BooksController {
 
   @Post('/like')
   @UseGuards(JwtAuthGuard)
-  async createUserOnBook(
+  createUserOnBooks(
     @Body('bookId', new ParseUUIDPipe()) bookId: string,
     @Body('userId', new ParseUUIDPipe()) userId: string,
   ) {
-    await this.booksService.createUserOnBook(bookId, userId);
-    return { success: true };
+    return this.booksService.createUserOnBooks(bookId, userId);
   }
 
   @Put('/:id')
